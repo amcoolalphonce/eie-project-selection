@@ -2,3 +2,4 @@ venv/
 __pycache__/
 .venv/
 project_titles.csv
+EIE/__pycache__/
