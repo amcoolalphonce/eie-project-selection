@@ -29,13 +29,15 @@
         <table>
             <thead>
                 <tr>
-                    <th>Project Name</th>
+                    <th>Project Title</th>
                     <th>Project Number</th>
                 </tr>
             </thead>
             <tbody>
                 {% for project in projects %}
                 <tr>
+                    <td>{{ project.PRJ_TITLE }}</td>
+                    <td>{{ project.PRJ_NUMBER }}</td>
                     <td>{{ project.NUMBER }}</td>
                     <td>{{ project.TITLE }}</td>
                 </tr>
