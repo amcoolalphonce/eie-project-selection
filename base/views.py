@@ -18,10 +18,8 @@ def home(request):
         reader = csv.DictReader(csvfile)
         for row in reader:
             project = {
-                'PROJECT NUMBER': row.get('NUMBER', ''),
-                'PROJECT TITLE': row.get('TITLE', ''), 
-    
-            }
+                'PRJ_NUMBER': row.get('prj_number', ''),
+                'PRJ_TITLE': row.get('prj_title', ''),}
             projects.append(project)
             print(project)
     
