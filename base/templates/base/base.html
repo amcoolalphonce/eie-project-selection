@@ -36,7 +36,17 @@
             </div>
         </div>
     </nav>
-
+<!-- messages div-->
+    <div class="messages">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="message {{ message.tags }}">
+                    {{ message }}   
+                </div>
+            {% endfor %}    
+        {% endif %}
+    </div>
+    
     <!-- Main Content Area -->
     <main class="main-content">
         {% block content %}
@@ -50,7 +60,7 @@
             <div class="footer-content">
                 <div class="footer-section">
                     <h3>About Us</h3>
-                    <p>Brief description about your company or website.</p>
+                    <p>An app to automate final year electrical project selections.</p>
                 </div>
                 <div class="footer-section">
                     <h3>Quick Links</h3>
@@ -61,12 +71,12 @@
                 </div>
                 <div class="footer-section">
                     <h3>Contact Info</h3>
-                    <p>Email: info@mysite.com</p>
-                    <p>Phone: (123) 456-7890</p>
+                    <p>Email: gevira@uonbi.ac.ke</p>
+                    <p>Phone: +254 700 000 000</p>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; {% now "Y" %} My Site. All rights reserved.</p>
+                <p>&copy; {% now "Y" %} EIE. All rights reserved.</p>
             </div>
         </div>
     </footer>
