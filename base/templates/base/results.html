@@ -29,15 +29,20 @@
         <table>
             <thead>
                 <tr>
-                    <th>Project Title</th>
                     <th>Project Number</th>
+                    <th>Project Title</th>
                 </tr>
             </thead>
             <tbody>
                 {% for project in projects %}
                 <tr>
-                    <td>{{ project.PRJ_TITLE }}</td>
                     <td>{{ project.PRJ_NUMBER }}</td>
+<<<<<<< HEAD
+                    <td>{{ project.PRJ_TITLE }}</td>
+=======
+                    <td>{{ project.NUMBER }}</td>
+                    <td>{{ project.TITLE }}</td>
+>>>>>>> 2c4297fc65429cf70ef7d7d74cf695dccc38a3d7
                 </tr>
                 {% endfor %}
             </tbody>
