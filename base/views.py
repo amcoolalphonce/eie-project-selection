@@ -18,10 +18,11 @@ def home(request):
         reader = csv.DictReader(csvfile)
         for row in reader:
             project = {
-                'PRJ_NUMBER': row.get('prj_number', ''),
-                'PRJ_TITLE': row.get('prj_title', ''), 
+                'PROJECT NUMBER': row.get('NUMBER', ''),
+                'PROJECT TITLE': row.get('TITLE', ''), 
     
             }
             projects.append(project)
+            print(project)
     
     return render(request, 'base/results.html', {'projects': projects})
