@@ -19,9 +19,7 @@ def home(request):
         for row in reader:
             project = {
                 'PRJ_NUMBER': row.get('prj_number', ''),
-                'PRJ_TITLE': row.get('prj_title', ''), 
-    
-            }
+                'PRJ_TITLE': row.get('prj_title', ''),}
             projects.append(project)
             print(project)
     
