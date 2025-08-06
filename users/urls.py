@@ -6,5 +6,4 @@ app_name = 'users'
 
 urlpatterns = [
     path('register', views.register, name='register'),
-    path('select-projects/', views.select_projects, name='select_projects'),
 ]

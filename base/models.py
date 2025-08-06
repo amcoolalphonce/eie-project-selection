@@ -10,8 +10,8 @@ class ProjectCSV(models.Model):
         return f"CSV uploaded at {self.uploaded_at}"
 
 class Project(models.Model):
-    project_title = models.CharField(max_length=255)
-    project_number = models.TextField()
+    project_title = models.CharField(max_length=255, default='')
+    project_number = models.TextField(blank=True, null=True)
     
     def __str__(self):
         return self.project_title
