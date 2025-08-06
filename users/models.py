@@ -7,6 +7,8 @@ class User(AbstractBaseUser):
     first_name = models.CharField(max_length=30, blank=True)
     last_name = models.CharField(max_length=30, blank=True)
 
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['email', 'first_name', 'last_name']
 
     def __str__(self):
         return self.username
@@ -14,5 +16,3 @@ class User(AbstractBaseUser):
     class Meta:
         verbose_name = 'User'
         verbose_name_plural = 'Users'
-
-
