@@ -1,5 +1,4 @@
-
-{%   extends "base/base.html" %}
+{% extends "base/base.html" %}
 {% block title %}Results - EIE Selection{% endblock %}
 {% block content %}
 <head>
@@ -8,6 +7,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-bottom: 20px;
         }
         th, td {
             border: 1px solid #ddd;
@@ -20,12 +20,31 @@
         tr:nth-child(even) {
             background-color: #f9f9f9;
         }
+        .pagination {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .pagination a {
+            color: black;
+            padding: 8px 16px;
+            text-decoration: none;
+            border: 1px solid #ddd;
+        }
+        .pagination a.active {
+            background-color: #4CAF50;
+            color: white;
+            border: 1px solid #4CAF50;
+        }
+        .pagination a:hover:not(.active) {
+            background-color: #ddd;
+        }
     </style>
 </head>
 <body>
     <h1>Project Data from CSV</h1>
     
-    {% if projects %}
+    {% if page_obj %}
         <table>
             <thead>
                 <tr>
@@ -34,7 +53,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for project in projects %}
+                {% for project in page_obj %}
                 <tr>
                     <td>{{ project.PRJ_NUMBER }}</td>
                     <td>{{ project.PRJ_TITLE }}</td>
@@ -42,9 +61,26 @@
                 {% endfor %}
             </tbody>
         </table>
+
+        <div class="pagination">
+            <span class="step-links">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1">&laquo; 1</a>
+                    <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+                {% endif %}
+
+                <span class="current">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}">next</a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
     {% else %}
         <p>No project data available.</p>
     {% endif %}
-
-
+</body>
 {% endblock content %}

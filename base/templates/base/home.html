@@ -1,7 +1,48 @@
+
 {%   extends "base/base.html" %}
-
-{% block title %}Home - EIE Selection{% endblock %}
-
+{% block title %}Results - EIE Selection{% endblock %}
 {% block content %}
-<h1>Welcome to EIE Selection</h1>
+
+    <h1>List of Projects</h1>
+    
+    {% if page_obj %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Project Number</th>
+                    <th>Project Title</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for project in page_obj %}
+                <tr>
+                    <td>{{ project.PRJ_NUMBER }}</td>
+                    <td>{{ project.PRJ_TITLE }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="pagination">
+            <span class="step-links">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1">&laquo; 1</a>
+                    <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+                {% endif %}
+
+                <span class="current">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}">next</a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+    {% else %}
+        <p>No project data available.</p>
+    {% endif %}
+
+
 {% endblock content %}
