@@ -1,0 +1,216 @@
+/* Login Container */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    padding: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Login Card */
+.login-card {
+    
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    animation: fadeInUp 0.6s ease-in-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Login Title */
+.login-title {
+    text-align: center;
+    color: #333;
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Error Message */
+.error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border-left: 4px solid #dc3545;
+    margin-bottom: 20px;
+    font-size: 14px;
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* Form Styles */
+.login-form {
+    width: 100%;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    color: #555;
+    font-weight: 500;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e1e5e9;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    background-color: #f8f9fa;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #667eea;
+    background-color: white;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    transform: translateY(-1px);
+}
+
+.form-input:hover {
+    border-color: #c3c7cc;
+}
+
+/* Login Button */
+.login-button {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.login-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.login-button:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+}
+
+/* Form Footer */
+.form-footer {
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e1e5e9;
+}
+
+.form-footer p {
+    color: #666;
+    font-size: 14px;
+    margin: 0;
+}
+
+.register-link {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.register-link:hover {
+    color: #764ba2;
+    text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .login-container {
+        padding: 10px;
+        min-height: 70vh;
+    }
+    
+    .login-card {
+        padding: 30px 25px;
+        margin: 10px;
+    }
+    
+    .login-title {
+        font-size: 1.5rem;
+        margin-bottom: 25px;
+    }
+    
+    .form-input {
+        padding: 10px 14px;
+        font-size: 14px;
+    }
+    
+    .login-button {
+        padding: 12px;
+        font-size: 14px;
+    }
+}
+
+/* Focus states for accessibility */
+.form-input:focus,
+.login-button:focus,
+.register-link:focus {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+/* Loading state (optional) */
+.login-button.loading {
+    opacity: 0.7;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.login-button.loading::after {
+    content: "";
+    width: 16px;
+    height: 16px;
+    margin-left: 10px;
+    border: 2px solid transparent;
+    border-top: 2px solid white;
+    border-radius: 50%;
+    display: inline-block;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
