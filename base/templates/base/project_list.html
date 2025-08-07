@@ -1,0 +1,178 @@
+{%  extends "base/base.html" %}
+<!-- Project List Template -->
+{% block title %}Project List{% endblock %}
+
+{% block content %}
+<div class="project-list-container">
+    <h1>Available Projects</h1>
+    <h2>View the list of the projects available and select a maximum of three</h2>
+    
+    <!-- Selection Status -->
+    <div class="selection-status">
+        <div class="selection-counter">
+            <span class="counter-text">Selected: </span>
+            <span class="counter-number" id="selection-count">{{ selections_count }}</span>
+            <span class="counter-max">/{{ max_selections }}</span>
+        </div>
+        <div class="selection-actions">
+            <button type="button" class="btn-clear" onclick="clearAllSelections()">Clear All</button>
+            <button type="submit" form="selection-form" class="btn-save">Save Selections</button>
+        </div>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Project Selection Form -->
+    <form method="post" id="selection-form">
+        {% csrf_token %}
+        
+        <table class="project-table">
+            <thead>
+                <tr>
+                    <th class="select-column">Select</th>
+                    <th>Project Number</th>
+                    <th>Project Title</th>
+                    <th class="status-column">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for project in page_obj %}
+                <tr class="project-row {% if project.id in user_selections %}selected{% endif %}">
+                    <td class="select-column">
+                        <div class="checkbox-container">
+                            <input type="checkbox" 
+                                   name="selected_projects" 
+                                   value="{{ project.id }}"
+                                   id="project-{{ project.id }}"
+                                   {% if project.id in user_selections %}checked{% endif %}
+                                   class="project-checkbox">
+                            <label for="project-{{ project.id }}" class="checkbox-label">
+                                <span class="checkmark"></span>
+                            </label>
+                        </div>
+                    </td>
+                    <td class="project-number">{{ project.project_number }}</td>
+                    <td class="project-title">{{ project.project_title }}</td>
+                    <td class="status-column">
+                        <span class="status-badge {% if project.id in user_selections %}status-selected{% else %}status-available{% endif %}">
+                            {% if project.id in user_selections %}Selected{% else %}Available{% endif %}
+                        </span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="no-projects">No projects available.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </form>
+
+    <!-- Pagination Controls -->
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+        <a href="?page=1" class="page-link">&laquo; First</a>
+        <a href="?page={{ page_obj.previous_page_number }}" class="page-link">Previous</a>
+        {% endif %}
+        
+        <span class="page-info">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        </span>
+        
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="page-link">Next</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}" class="page-link">Last &raquo;</a>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+// JavaScript for handling project selection
+document.addEventListener('DOMContentLoaded', function() {
+    const checkboxes = document.querySelectorAll('.project-checkbox');
+    const maxSelections = {{ max_selections }};
+    const selectionCounter = document.getElementById('selection-count');
+    
+    // Update counter and row styling
+    function updateUI() {
+        const checkedBoxes = document.querySelectorAll('.project-checkbox:checked');
+        selectionCounter.textContent = checkedBoxes.length;
+        
+        // Update row styling
+        checkboxes.forEach(checkbox => {
+            const row = checkbox.closest('.project-row');
+            const statusBadge = row.querySelector('.status-badge');
+            
+            if (checkbox.checked) {
+                row.classList.add('selected');
+                statusBadge.textContent = 'Selected';
+                statusBadge.className = 'status-badge status-selected';
+            } else {
+                row.classList.remove('selected');
+                statusBadge.textContent = 'Available';
+                statusBadge.className = 'status-badge status-available';
+            }
+        });
+        
+        // Update counter color based on selection count
+        const counter = document.querySelector('.counter-number');
+        if (checkedBoxes.length === maxSelections) {
+            counter.classList.add('max-reached');
+        } else {
+            counter.classList.remove('max-reached');
+        }
+    }
+    
+    // Handle checkbox changes
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const checkedBoxes = document.querySelectorAll('.project-checkbox:checked');
+            
+            if (checkedBoxes.length > maxSelections) {
+                this.checked = false;
+                showAlert(`You can only select a maximum of ${maxSelections} projects.`, 'warning');
+                return;
+            }
+            
+            updateUI();
+        });
+    });
+    
+    // Clear all selections
+    window.clearAllSelections = function() {
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        updateUI();
+        showAlert('All selections cleared.', 'info');
+    };
+    
+    // Show alert messages
+    function showAlert(message, type) {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type} alert-temporary`;
+        alertDiv.textContent = message;
+        
+        const messagesContainer = document.querySelector('.messages-container') || 
+                                 document.querySelector('.selection-status');
+        messagesContainer.appendChild(alertDiv);
+        
+        setTimeout(() => {
+            alertDiv.remove();
+        }, 3000);
+    }
+    
+    // Initial UI update
+    updateUI();
+});
+</script>
+{% endblock %}

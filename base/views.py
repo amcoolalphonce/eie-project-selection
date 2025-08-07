@@ -1,9 +1,11 @@
 from django.shortcuts import render,redirect
 import csv
-from .models import ProjectCSV
+from .models import ProjectCSV, Project, UserProjectSelection
 from django.core.paginator import Paginator
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+
 
 def home(request):
     latest_csv = ProjectCSV.objects.last()
@@ -45,3 +47,57 @@ def custom_login(request):
 def custom_logout(request):
     logout(request)
     return redirect('home')
+
+@login_required
+def project_list(request):
+    if request.method == 'POST':
+        return handle_project_selection(request)
+    
+    
+    list_of_projects = Project.objects.all()
+    paginator = Paginator(list_of_projects, 10)  
+    page_number = request.GET.get('page')   
+    page_obj = paginator.get_page(page_number)
+    return render(request, 'base/project_list.html', {'page_obj': page_obj})
+    
+    user_selections = UserProjectSelection.objects.filter(user=request.user).values_list('project__project_title', flat=True)
+    
+    context = {
+        'page_obj': page_obj,
+        'user_selections': list(user_selections),
+        'selection_count': len(user_selections),
+        'max_selection': 3,
+    }
+    return render(request, 'base/project_list.html', context)
+
+
+def handle_project_selection(request):
+    selected_project_ids = request.POST.getlist('selected_projects')
+    
+   
+    current_selections = UserProjectSelection.objects.filter(user=request.user)
+    current_count = current_selections.count()
+    
+    new_selections = len(selected_project_ids)
+    if new_selections > 3:
+        messages.error(request, "You can only select a maximum of 3 projects.")
+        return redirect('project_list')
+    
+    try:
+        current_selections.delete()
+
+        for project_id in selected_project_ids:
+            project = Project.objects.get(id=project_id)
+            UserProjectSelection.objects.create(
+                user=request.user,
+                project=project
+            )
+        
+        messages.success(request, f"Successfully selected {new_selections} project(s)!")
+        
+    except Project.DoesNotExist:
+        messages.error(request, "One or more selected projects do not exist.")
+    except Exception as e:
+        messages.error(request, "An error occurred while saving your selections.")
+    
+    return redirect('project_list')

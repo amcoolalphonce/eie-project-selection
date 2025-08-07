@@ -15,3 +15,13 @@ class Project(models.Model):
     
     def __str__(self):
         return self.project_title
+    
+    
+class UserProjectSelection(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    selected_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = 'User Project Selection'
+        verbose_name_plural = 'User Project Selections'
