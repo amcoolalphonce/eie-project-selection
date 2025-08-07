@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="{% static 'home.css' %}">
     <link rel="stylesheet" href="{% static 'select_projects.css' %}">
     <link rel="stylesheet" href="{% static 'login.css' %}">
+    <link rel="stylesheet" href="{% static 'user_selected_project.css' %}">
     <!-- Additional CSS block for child templates -->
     {% block extra_css %}{% endblock %}
 </head>
@@ -29,7 +30,9 @@
                 <li class="nav-item">
                     <a href="{% url 'project_list' %}" class="nav-link">Select Project</a>
                 </li>
-                
+                <li class="nav-item">
+                    <a href="{% url 'my_projects' %}" class="nav-link">My Project List</a>
+                </li>
                 <li class="nav-item">
                     <a href="{% url 'home' %}" class="nav-link">Home</a>
                 </li>

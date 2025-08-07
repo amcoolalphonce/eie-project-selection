@@ -101,3 +101,17 @@ def handle_project_selection(request):
         messages.error(request, "An error occurred while saving your selections.")
     
     return redirect('project_list')
+
+
+# user selected projects view
+@login_required
+def user_selected_projects(request):
+    user_selections = UserProjectSelection.objects.filter(user=request.user)
+    selected_projects = [selection.project for selection in user_selections]
+    
+    context = {
+        'selected_projects': selected_projects,
+        'selection_count': len(selected_projects),
+    }
+    
+    return render(request, 'base/user_selected_projects.html', context)

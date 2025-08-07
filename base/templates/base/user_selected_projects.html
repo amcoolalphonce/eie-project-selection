@@ -1,0 +1,46 @@
+{% extends 'base/base.html'%}
+
+<!-- Display user Selected Projects Template -->
+{% block title %}User Selected Projects{% endblock %}
+
+{% block content %} 
+<div class="selected-projects-container">
+    <div class="header-section">
+        <h1>My Selected Projects</h1>
+        <p class="subtitle">You have selected {{ selection_count }} project{{ selection_count|pluralize }}</p>
+    </div>
+
+    {% if selected_projects %}
+    <div class="projects-grid">
+        {% for project in selected_projects %}
+        <div class="project-card">
+            <div class="project-header">
+                <div class="project-number">{{ project.project_number }}</div>
+                <div class="selection-badge">Selected</div>
+            </div>
+            <div class="project-content">
+                <h3 class="project-title">{{ project.project_title }}</h3>
+                {% if project.project_description %}
+                <p class="project-description">{{ project.project_description }}</p>
+                {% endif %}
+            </div>
+            <div class="project-footer">
+                <span class="project-info">Project CODE: {{ project.id }}</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">📋</div>
+        <h2>No Projects Selected</h2>
+        <p>You haven't selected any projects yet. Choose up to 3 projects from the available list.</p>
+        <a href="{% url 'project_list' %}" class="btn btn-primary">
+            Browse Projects
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock content %}
