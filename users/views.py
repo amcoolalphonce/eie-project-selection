@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from  .models import User
-from django.contrib.auth.forms import UserCreationForm
+from .forms import UserRegistrationForm
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout 
 from base.models import Project
@@ -10,7 +10,7 @@ from django.utils import timezone
 
 def register(request):  
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = UserRegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
             username = form.cleaned_data.get('username')
@@ -21,7 +21,7 @@ def register(request):
         else:
             messages.error(request, 'Error creating account. Please try again.')
     else:
-        form = UserCreationForm()
+        form = UserRegistrationForm()
     
     return render(request, 'users/register.html', {'form': form})
 

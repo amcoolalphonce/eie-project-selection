@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'base',
     'users',
 ]
-
+# i have used manager
 AUTH_USER_MODEL = 'users.User'
 
 MIDDLEWARE = [
