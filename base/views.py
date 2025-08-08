@@ -8,21 +8,12 @@ from django.contrib.auth.decorators import login_required
 
 
 def home(request):
-    latest_csv = ProjectCSV.objects.last()
+    # Get all projects from the database
+    projects = Project.objects.all().order_by('-created_at')
     
-    if not latest_csv:
-        messages.error(request, "No CSV file uploaded yet.")
+    if not projects.exists():
+        messages.info(request, "No projects available yet. Please contact an administrator to add projects.")
         return render(request, 'base/home.html', {'page_obj': None})
-
-    projects = []
-    with latest_csv.file.open('r') as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            project = {
-                'PRJ_NUMBER': row.get('prj_number', ''),
-                'PRJ_TITLE': row.get('prj_title', ''),
-            }
-            projects.append(project)
 
     paginator = Paginator(projects, 10)
     page_number = request.GET.get('page')
@@ -53,13 +44,17 @@ def select_projects(request):
     if request.method == 'POST':
         return handle_project_selection(request)
     
+<<<<<<< HEAD
     list_of_projects = Project.objects.all()
+=======
+    list_of_projects = Project.objects.all().order_by('-created_at')
+>>>>>>> 66d4a2e926e71498ea5bb244072b620e360c098e
     paginator = Paginator(list_of_projects, 200)  
     page_number = request.GET.get('page')   
     page_obj = paginator.get_page(page_number)
     
     #user's current selections
-    user_selections = UserProjectSelection.objects.filter(user=request.user).values_list('project__project_title', flat=True)
+    user_selections = UserProjectSelection.objects.filter(user=request.user).values_list('project__id', flat=True)
     
     context = {
         'page_obj': page_obj,
