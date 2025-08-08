@@ -14,7 +14,7 @@ class Project(models.Model):
     project_number = models.TextField(blank=True, null=True)
     
     def __str__(self):
-        return self.project_title
+        return self.project_number
     
     
 class UserProjectSelection(models.Model):
