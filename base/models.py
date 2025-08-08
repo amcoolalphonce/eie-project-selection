@@ -18,7 +18,7 @@ class Project(models.Model):
     def __str__(self):
         return self.project_number
     
-    
+#  
 class UserProjectSelection(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
