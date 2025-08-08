@@ -44,11 +44,8 @@ def select_projects(request):
     if request.method == 'POST':
         return handle_project_selection(request)
     
-<<<<<<< HEAD
-    list_of_projects = Project.objects.all()
-=======
+
     list_of_projects = Project.objects.all().order_by('-created_at')
->>>>>>> 66d4a2e926e71498ea5bb244072b620e360c098e
     paginator = Paginator(list_of_projects, 200)  
     page_number = request.GET.get('page')   
     page_obj = paginator.get_page(page_number)
