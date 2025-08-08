@@ -8,8 +8,8 @@
 body {
     font-family: 'Arial', sans-serif;
     line-height: 1.6;
-    color: #333;
-    background-color: #fff;
+    color: black;
+    background-color: #F0EEE8;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
