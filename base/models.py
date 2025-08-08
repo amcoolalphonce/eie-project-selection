@@ -25,3 +25,6 @@ class UserProjectSelection(models.Model):
     class Meta:
         verbose_name = 'User Project Selection'
         verbose_name_plural = 'User Project Selections'
+        
+    def __str__(self):
+        return f"{self.project.project_number}"
