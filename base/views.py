@@ -54,7 +54,7 @@ def select_projects(request):
         return handle_project_selection(request)
     
     list_of_projects = Project.objects.all()
-    paginator = Paginator(list_of_projects, 10)  
+    paginator = Paginator(list_of_projects, 200)  
     page_number = request.GET.get('page')   
     page_obj = paginator.get_page(page_number)
     
