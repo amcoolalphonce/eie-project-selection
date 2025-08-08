@@ -1,0 +1,264 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block extrahead %}{{ block.super }}
+<script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
+{{ form.media }}
+{% endblock %}
+
+{% block extrastyle %}{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}">
+<style>
+    .csv-upload-container {
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .csv-upload-header {
+        border-bottom: 2px solid #79aec8;
+        padding-bottom: 15px;
+        margin-bottom: 30px;
+    }
+    
+    .csv-upload-header h1 {
+        color: #417690;
+        margin: 0;
+        font-size: 24px;
+    }
+    
+    .csv-instructions {
+        background: #f8f9fa;
+        border-left: 4px solid #79aec8;
+        padding: 15px;
+        margin-bottom: 25px;
+        border-radius: 4px;
+    }
+    
+    .csv-instructions h3 {
+        margin-top: 0;
+        color: #417690;
+    }
+    
+    .csv-instructions ul {
+        margin: 10px 0;
+        padding-left: 20px;
+    }
+    
+    .csv-instructions li {
+        margin-bottom: 5px;
+    }
+    
+    .csv-upload-form {
+        margin-top: 20px;
+    }
+    
+    .form-row {
+        margin-bottom: 20px;
+    }
+    
+    .form-row label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 8px;
+        color: #333;
+    }
+    
+    .form-row input[type="file"] {
+        width: 100%;
+        padding: 10px;
+        border: 2px dashed #ccc;
+        border-radius: 4px;
+        background: #fafafa;
+    }
+    
+    .form-row input[type="file"]:hover {
+        border-color: #79aec8;
+        background: #f0f8ff;
+    }
+    
+    .submit-row {
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #eee;
+        text-align: right;
+    }
+    
+    .submit-row input[type="submit"] {
+        background: #417690;
+        color: white;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: bold;
+    }
+    
+    .submit-row input[type="submit"]:hover {
+        background: #295a6d;
+    }
+    
+    .sample-csv {
+        background: #e8f5e8;
+        border: 1px solid #4caf50;
+        border-radius: 4px;
+        padding: 15px;
+        margin-top: 20px;
+    }
+    
+    .sample-csv h4 {
+        margin-top: 0;
+        color: #2e7d32;
+    }
+    
+    .sample-csv pre {
+        background: #f5f5f5;
+        padding: 10px;
+        border-radius: 4px;
+        overflow-x: auto;
+        margin: 10px 0;
+    }
+    
+    .error-message {
+        background: #ffebee;
+        border: 1px solid #f44336;
+        color: #c62828;
+        padding: 10px;
+        border-radius: 4px;
+        margin-bottom: 20px;
+    }
+    
+    .success-message {
+        background: #e8f5e8;
+        border: 1px solid #4caf50;
+        color: #2e7d32;
+        padding: 10px;
+        border-radius: 4px;
+        margin-bottom: 20px;
+    }
+    
+    .format-examples {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 4px;
+        padding: 15px;
+        margin-top: 20px;
+    }
+    
+    .format-examples h4 {
+        margin-top: 0;
+        color: #856404;
+    }
+</style>
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+    &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+    &rsaquo; <a href="{% url 'admin:base_project_changelist' %}">Projects</a>
+    &rsaquo; {% trans 'Upload CSV' %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="csv-upload-container">
+    <div class="csv-upload-header">
+        <h1>{% trans 'Upload Projects CSV' %}</h1>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="{% if message.tags == 'error' %}error-message{% elif message.tags == 'success' %}success-message{% else %}info-message{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="csv-instructions">
+        <h3>{% trans 'Instructions' %}</h3>
+        <ul>
+            <li>Upload a CSV file containing project information</li>
+            <li>The system supports multiple CSV formats (see examples below)</li>
+            <li>Project numbers must be unique</li>
+            <li>Both project number and title are required for each row</li>
+            <li>Existing projects with the same project number will be updated</li>
+            <li>New projects will be created for unique project numbers</li>
+        </ul>
+    </div>
+
+    <div class="csv-upload-form">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="form-row">
+                <label for="csv_file">{% trans 'Select CSV File:' %}</label>
+                <input type="file" name="csv_file" id="csv_file" accept=".csv" required>
+            </div>
+
+            <div class="submit-row">
+                <input type="submit" value="{% trans 'Upload and Import Projects' %}">
+            </div>
+        </form>
+    </div>
+
+    <div class="format-examples">
+        <h4>{% trans 'Supported CSV Formats' %}</h4>
+        <p>The system automatically detects and supports the following CSV formats:</p>
+        
+        <div class="sample-csv">
+            <h5>Format 1: Standard Format</h5>
+            <pre>project_number,project_title
+PRJ001,Smart Home Automation System
+PRJ002,Solar Power Management System
+PRJ003,Electric Vehicle Charging Station</pre>
+        </div>
+        
+        <div class="sample-csv">
+            <h5>Format 2: PRJ/TITLE Format</h5>
+            <pre>PRJ,TITLE
+001,INVESTIGATE DESIGN AND OPERATIONALIZE SATELLITE TRACKING MECHANISM
+002,INVESTIGATE AND DESIGN OF A MICROWAVE PATCH ANTENNA
+003,INVESTIGATE AND DESIGN OF SATELLITE COMMUNICATION</pre>
+        </div>
+        
+        <div class="sample-csv">
+            <h5>Format 3: Legacy Format</h5>
+            <pre>prj_number,prj_title
+PRJ001,Smart Home Automation System
+PRJ002,Solar Power Management System
+PRJ003,Electric Vehicle Charging Station</pre>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('csv_file');
+    const submitButton = document.querySelector('input[type="submit"]');
+    
+    fileInput.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            if (!file.name.toLowerCase().endsWith('.csv')) {
+                alert('Please select a valid CSV file.');
+                this.value = '';
+                return;
+            }
+            
+            // Enable submit button
+            submitButton.disabled = false;
+        } else {
+            submitButton.disabled = true;
+        }
+    });
+    
+    // Initially disable submit button
+    submitButton.disabled = true;
+});
+</script>
+{% endblock %} 

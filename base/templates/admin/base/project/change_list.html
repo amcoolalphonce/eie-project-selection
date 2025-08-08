@@ -1,0 +1,40 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_urls %}
+
+{% block object-tools-items %}
+    {% if show_csv_info %}
+    <li>
+        <span style="background: #17a2b8; color: white; padding: 8px 12px; border-radius: 4px; font-size: 12px;">
+            📁 CSV Import: Use command line
+        </span>
+    </li>
+    {% endif %}
+    {{ block.super }}
+{% endblock %}
+
+{% block content %}
+    {{ block.super }}
+    
+    {% if show_csv_info %}
+    <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px;">
+        <h3>📁 CSV Import Instructions</h3>
+        <p>To import projects from a CSV file, use the management command:</p>
+        <pre style="background: #e9ecef; padding: 10px; border-radius: 4px; margin: 10px 0;">
+python manage.py import_projects_csv path/to/your/file.csv</pre>
+        
+        <h4>Supported CSV Formats:</h4>
+        <ul>
+            <li><strong>Standard:</strong> <code>project_number,project_title</code></li>
+            <li><strong>PRJ/TITLE:</strong> <code>PRJ,TITLE</code></li>
+            <li><strong>Legacy:</strong> <code>prj_number,prj_title</code></li>
+        </ul>
+        
+        <p><strong>Example:</strong></p>
+        <pre style="background: #e9ecef; padding: 10px; border-radius: 4px; margin: 10px 0;">
+PRJ,TITLE
+001,Smart Home Automation System
+002,Solar Power Management System
+003,Electric Vehicle Charging Station</pre>
+    </div>
+    {% endif %}
+{% endblock %} 
