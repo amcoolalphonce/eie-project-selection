@@ -1,40 +1,131 @@
-{% extends "base/base.html" %}
-{% block content %}
-<h1>Select up to 3 Projects</h1>
-<form method="post">
-    {% csrf_token %}
-    <table>
-        <thead>
-            <tr>
-                <th>Select</th>
-                <th>Project Number</th>
-                <th>Project Title</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for project in projects %}
-            <tr>
-                <td>
-                    <input type="checkbox" name="projects" value="{{ project.id }}"
-                        {% if project.id in selected_project_ids %}checked disabled{% endif %}
-                        {% if selected_project_ids|length >= 3 and project.id not in selected_project_ids %}disabled{% endif %}
-                    >
-                </td>
-                <td>{{ project.prj_number }}</td>
-                <td>{{ project.prj_title }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <button type="submit">Save Selections</button>
-</form>
+<!-- templates/projects/select_projects.html -->
+{% extends 'base/base.html' %}
+{% load static %}
 
-<h2>Your Selected Projects</h2>
-<ul>
-    {% for sel in selected_projects %}
-        <li>{{ sel.project.prj_number }}: {{ sel.project.prj_title }} (selected at {{ sel.timestamp }})</li>
-    {% empty %}
-        <li>You have not selected any projects yet.</li>
-    {% endfor %}
-</ul>
+{% block title %}Select Projects{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">Select Your Project Preferences</h3>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    {% if current_selections %}
+                        <div class="alert alert-info mb-4">
+                            <h5>Your Current Selections:</h5>
+                            <ul class="mb-0">
+                                {% for selection in current_selections %}
+                                    <li>{{ selection.get_choice_priority_display }}: {{ selection.project.project_number }} - {{ selection.project.project_title }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.non_field_errors %}
+                                    <p class="mb-0">{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <div class="mb-3">
+                            <label for="{{ form.project_1.id_for_label }}" class="form-label">
+                                <strong>{{ form.project_1.label }}</strong>
+                            </label>
+                            {{ form.project_1 }}
+                            {% if form.project_1.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.project_1.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.project_2.id_for_label }}" class="form-label">
+                                <strong>{{ form.project_2.label }}</strong>
+                            </label>
+                            {{ form.project_2 }}
+                            {% if form.project_2.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.project_2.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.project_3.id_for_label }}" class="form-label">
+                                <strong>{{ form.project_3.label }}</strong>
+                            </label>
+                            {{ form.project_3 }}
+                            {% if form.project_3.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.project_3.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">Save Project Selections</button>
+                        </div>
+                    </form>
+
+                    <div class="mt-4">
+                        <h5>Instructions:</h5>
+                        <ul class="text-muted">
+                            <li>You must select exactly three different project numbers</li>
+                            <li>Enter the project numbers in order of preference (1st, 2nd, 3rd choice)</li>
+                            <li>Project numbers must exist in the database</li>
+                            <li>Your new selections will overwrite any previous selections</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control {
+        border-radius: 0.375rem;
+        padding: 0.75rem;
+        font-size: 1rem;
+    }
+    
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+    
+    .card {
+        border: none;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+    
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+    }
+</style>
 {% endblock %}

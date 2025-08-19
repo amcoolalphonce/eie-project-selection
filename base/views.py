@@ -5,6 +5,8 @@ from django.core.paginator import Paginator
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from .forms import ProjectSelectionForm
+from django.db import transaction
 
 
 def home(request):
@@ -39,76 +41,58 @@ def custom_logout(request):
     logout(request)
     return redirect('home')
 
+
 @login_required
 def select_projects(request):
+    # Get user's current selections to pre-populate form
+    current_selections = UserProjectSelection.objects.filter(user=request.user).order_by('choice_priority')
+    initial_data = {}
+    
+    for selection in current_selections:
+        if selection.choice_priority == 1:
+            initial_data['project_1'] = selection.project.project_number
+        elif selection.choice_priority == 2:
+            initial_data['project_2'] = selection.project.project_number
+        elif selection.choice_priority == 3:
+            initial_data['project_3'] = selection.project.project_number
+    
     if request.method == 'POST':
-        return handle_project_selection(request)
-    
-
-    list_of_projects = Project.objects.all().order_by('-created_at')
-    paginator = Paginator(list_of_projects, 200)  
-    page_number = request.GET.get('page')   
-    page_obj = paginator.get_page(page_number)
-    
-    #user's current selections
-    user_selections = UserProjectSelection.objects.filter(user=request.user).values_list('project__id', flat=True)
+        form = ProjectSelectionForm(request.POST)
+        if form.is_valid():
+            try:
+                with transaction.atomic():
+                    # Delete existing selections for this user
+                    UserProjectSelection.objects.filter(user=request.user).delete()
+                    
+                    # Create new selections
+                    project_numbers = [
+                        form.cleaned_data['project_1'],
+                        form.cleaned_data['project_2'], 
+                        form.cleaned_data['project_3']
+                    ]
+                    
+                    for priority, project_number in enumerate(project_numbers, 1):
+                        project = Project.objects.get(project_number=project_number)
+                        UserProjectSelection.objects.create(
+                            user=request.user,
+                            project=project,
+                            choice_priority=priority
+                        )
+                    
+                    messages.success(request, 'Your project selections have been saved successfully!')
+                    return redirect('select_projects')  # Redirect to avoid re-submission
+                    
+            except Exception as e:
+                messages.error(request, f'An error occurred while saving your selections: {str(e)}')
+    else:
+        form = ProjectSelectionForm(initial=initial_data)
     
     context = {
-        'page_obj': page_obj,
-        'user_selections': list(user_selections),
-        'selection_count': len(user_selections),
-        'max_selection': 3,
+        'form': form,
+        'current_selections': current_selections,
     }
-    return render(request, 'base/project_list.html', context)
+    return render(request, 'base/select_projects.html', context)
 
-
-def handle_project_selection(request):
-    selected_project_ids = request.POST.getlist('selected_projects')
-    current_selections = UserProjectSelection.objects.filter(user=request.user)
-    current_count = current_selections.count()
-    new_selections = len(selected_project_ids)
-    
-    # If user tries to select more than 3 projects, clear all and start over
-    if new_selections > 3:
-        current_selections.delete()
-        messages.error(request, "You tried to select more than 3 projects. All selections have been cleared. Please select exactly 3 projects.")
-        return redirect('select_projects')
-    
-    # If user has 3 selections and tries to select any new project(s), clear all
-    if current_count == 3 and new_selections > 0:
-        # Check if the new selection is different from current selections
-        current_project_ids = set(current_selections.values_list('project__id', flat=True))
-        new_project_ids = set(int(pid) for pid in selected_project_ids)
-        
-        if new_project_ids != current_project_ids:
-            current_selections.delete()
-            messages.warning(request, "You already had 3 projects selected. Your previous selections have been cleared. Please select exactly 3 projects.")
-            return redirect('select_projects')
-    
-    # Only allow saving if exactly 3 projects are selected
-    if new_selections != 3:
-        messages.error(request, "You must select exactly 3 projects.")
-        return redirect('select_projects')
-    
-    try:
-        # Clear existing selections and save new ones
-        current_selections.delete()
-
-        for project_id in selected_project_ids:
-            project = Project.objects.get(id=project_id)
-            UserProjectSelection.objects.create(
-                user=request.user,
-                project=project
-            )
-        
-        messages.success(request, f"Successfully selected 3 projects!")
-        
-    except Project.DoesNotExist:
-        messages.error(request, "One or more selected projects do not exist.")
-    except Exception as e:
-        messages.error(request, "An error occurred while saving your selections.")
-    
-    return redirect('select_projects')
 
 
 # user selected projects view
