@@ -1,45 +1,75 @@
-{% extends 'base/base.html'%}
+{% extends 'base/base.html' %}
+{% load static %}
 
-<!-- Display user Selected Projects Template -->
-{% block title %}User Selected Projects{% endblock %}
+{% block title %}My Selected Projects{% endblock %}
 
-{% block content %} 
+{% block content %}
+
 <div class="selected-projects-container">
     <div class="header-section">
         <h1>My Selected Projects</h1>
-        <p class="subtitle">You have selected {{ selection_count }} project{{ selection_count|pluralize }}</p>
+        <p class="subtitle">You have selected {{ selection_count }} project{{ selection_count|pluralize }} in order of priority</p>
     </div>
 
-    {% if selected_projects %}
+    {% if selected_projects_with_priority %}
     <div class="projects-grid">
-        {% for project in selected_projects %}
-        <div class="project-card">
+        {% for item in selected_projects_with_priority %}
+        <div class="project-card priority-{{ item.priority }}">
             <div class="project-header">
-                <div class="project-number">{{ project.project_number }}</div>
-                <div class="selection-badge">Selected</div>
+                <div class="priority-badge priority-{{ item.priority }}">
+                    <span class="priority-number">{{ item.priority }}</span>
+                    <span class="priority-text">{{ item.priority_display }}</span>
+                </div>
+                <div class="project-number">{{ item.project.project_number }}</div>
             </div>
             <div class="project-content">
-                <h3 class="project-title">{{ project.project_title }}</h3>
-                {% if project.project_description %}
-                <p class="project-description">{{ project.project_description }}</p>
+                <h3 class="project-title">{{ item.project.project_title }}</h3>
+                {% if item.project.project_description %}
+                <p class="project-description">{{ item.project.project_description|truncatewords:25 }}</p>
                 {% endif %}
+                
+                <div class="project-details">
+                    {% if item.project.supervisor %}
+                    <div class="detail-row">
+                        <span class="detail-label">Supervisor:</span>
+                        <span class="detail-value">{{ item.project.supervisor }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if item.project.department %}
+                    <div class="detail-row">
+                        <span class="detail-label">Department:</span>
+                        <span class="detail-value">{{ item.project.department }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if item.project.max_students %}
+                    <div class="detail-row">
+                        <span class="detail-label">Max Students:</span>
+                        <span class="detail-value">{{ item.project.max_students }}</span>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
             <div class="project-footer">
-                <span class="project-info">Project CODE: {{ project.id }}</span>
+                <span class="project-info">Project ID: {{ item.project.id }}</span>
+                <span class="selection-date">Selected: {{ item.selection_object.created_at|date:"M d, Y" }}</span>
             </div>
         </div>
         {% endfor %}
     </div>
 
+    <div class="actions-section">
+        <a href="{% url 'select_projects' %}" class="btn btn-primary">Modify Selections</a>
+        <a href="{% url 'select_projects' %}" class="btn btn-primary">Browse All Projects</a>
+    </div>
 
     {% else %}
     <div class="empty-state">
         <div class="empty-icon">📋</div>
         <h2>No Projects Selected</h2>
-        <p>You haven't selected any projects yet. Choose up to 3 projects from the available list.</p>
-        <a href="{% url 'select_projects' %}" class="btn btn-primary">
-            Browse Projects
-        </a>
+        <p>You haven't selected any projects yet. Choose up to 3 projects from the available list in order of your preference.</p>
+        <a href="{% url 'select_projects' %}" class="btn btn-primary">Select Projects</a>
     </div>
     {% endif %}
 </div>

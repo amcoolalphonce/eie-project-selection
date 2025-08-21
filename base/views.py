@@ -10,7 +10,6 @@ from django.db import transaction
 
 
 def home(request):
-    # Get all projects from the database
     projects = Project.objects.all().order_by('-created_at')
     
     if not projects.exists():
@@ -44,7 +43,6 @@ def custom_logout(request):
 
 @login_required
 def select_projects(request):
-    # Get user's current selections to pre-populate form
     current_selections = UserProjectSelection.objects.filter(user=request.user).order_by('choice_priority')
     initial_data = {}
     
@@ -61,10 +59,8 @@ def select_projects(request):
         if form.is_valid():
             try:
                 with transaction.atomic():
-                    # Delete existing selections for this user
                     UserProjectSelection.objects.filter(user=request.user).delete()
                     
-                    # Create new selections
                     project_numbers = [
                         form.cleaned_data['project_1'],
                         form.cleaned_data['project_2'], 
@@ -80,7 +76,7 @@ def select_projects(request):
                         )
                     
                     messages.success(request, 'Your project selections have been saved successfully!')
-                    return redirect('select_projects')  # Redirect to avoid re-submission
+                    return redirect('select_projects')  
                     
             except Exception as e:
                 messages.error(request, f'An error occurred while saving your selections: {str(e)}')
@@ -98,12 +94,26 @@ def select_projects(request):
 # user selected projects view
 @login_required
 def user_selected_projects(request):
-    user_selections = UserProjectSelection.objects.filter(user=request.user)
-    selected_projects = [selection.project for selection in user_selections]
+    user_selections = UserProjectSelection.objects.filter(
+        user=request.user
+    ).select_related('project').order_by('choice_priority')
+    
+    # Create a list of dictionaries containing both project and priority info
+    selected_projects_with_priority = []
+    for selection in user_selections:
+        selected_projects_with_priority.append({
+            'project': selection.project,
+            'priority': selection.choice_priority,
+            'priority_display': selection.get_choice_priority_display(),
+            'selection_object': selection  
+        })
     
     context = {
-        'selected_projects': selected_projects,
-        'selection_count': len(selected_projects),
+        'selected_projects_with_priority': selected_projects_with_priority,
+        'user_selections': user_selections,  # Keep this for backward compatibility
+        'selected_projects': [item['project'] for item in selected_projects_with_priority],  # Keep for backward compatibility
+        'selection_count': len(selected_projects_with_priority),
+        'has_selections': len(selected_projects_with_priority) > 0,
     }
     
     return render(request, 'base/user_selected_projects.html', context)
