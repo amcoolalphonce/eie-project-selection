@@ -4,7 +4,8 @@ from django.contrib import messages
 from django.urls import path
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from .models import ProjectCSV, Project, UserProjectSelection
+from .models import ProjectCSV, Project, UserProjectSelection, AllocationRound, ProjectAssignment
+
 import csv
 import io
 from django.core.exceptions import ValidationError
